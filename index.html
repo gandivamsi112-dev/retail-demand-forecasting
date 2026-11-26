@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retail Demand Forecasting — Time Series Prediction & Inventory Optimization</title>
+  <meta name="description" content="Interactive web application and technical showcase for Retail Demand Forecasting using ARIMA, Prophet, and LSTM time series models." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#hero" class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18" />
+            <path d="m19 9-5 5-4-4-3 3" />
+          </svg>
+        </span>
+        <span>RetailCast <strong>AI</strong></span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#dashboard">Live Dashboard</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#eda">EDA &amp; Features</a>
+        <a href="#models">Models</a>
+        <a href="#code">Implementation</a>
+        <a href="#viva">Viva Q&amp;A</a>
+      </nav>
+      <div class="nav-actions">
+        <span id="backendStatusPill" class="backend-pill">Connecting...</span>
+        <a href="#dashboard" class="btn btn-primary btn-sm">Open Simulator</a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-nav" id="mobileNav" hidden>
+      <a href="#dashboard">Live Dashboard</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#eda">EDA &amp; Features</a>
+      <a href="#models">Models</a>
+      <a href="#code">Implementation</a>
+      <a href="#viva">Viva Q&amp;A</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="badge">Project 5 &middot; Machine Learning &amp; Time Series Forecasting</div>
+          <h1>Demand Forecasting for Retail Using Time Series Prediction</h1>
+          <p class="hero-lead">
+            Predict future product demand accurately using historical sales, prices, discounts, promotions, weekends, and public holidays—so retail stores maintain optimal inventory levels and eliminate costly overstocking or stockouts.
+          </p>
+          <div class="hero-cta">
+            <a href="#dashboard" class="btn btn-primary">Explore Interactive Forecast</a>
+            <a href="#models" class="btn btn-secondary">Compare ARIMA, Prophet &amp; LSTM</a>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric-pill">
+              <span class="metric-label">Forecasting Models</span>
+              <span class="metric-value">ARIMA &middot; Prophet &middot; LSTM</span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-label">Evaluation Metrics</span>
+              <span class="metric-value">RMSE &amp; MAPE</span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-label">Primary Objective</span>
+              <span class="metric-value">Optimal Inventory</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span class="dot red"></span><span class="dot amber"></span><span class="dot green"></span>
+            <span class="hero-card-title">Problem &rarr; Solution Blueprint</span>
+          </div>
+          <div class="problem-solution-list">
+            <div class="ps-item danger">
+              <div class="ps-title">Overstocking Risk</div>
+              <p>Purchasing too many units causes high storage costs, capital lockup, product damage, and wastage.</p>
+            </div>
+            <div class="ps-item warning">
+              <div class="ps-title">Stockout Risk</div>
+              <p>Purchasing too few units leads to empty shelves during festivals/promotions, lost sales, and unhappy customers.</p>
+            </div>
+            <div class="ps-item success">
+              <div class="ps-title">Automated Forecasting Solution</div>
+              <p>Chronological 80/20 time series modeling captures trends, seasonality, discounts, and holidays to generate exact reorder quantities.</p>
+            </div>
+          </div>
+          <div class="objectives-strip">
+            <span>Daily / Weekly / Seasonal Trends</span>
+            <span>Promo &amp; Holiday Impact</span>
+            <span>Safety Stock Alerts</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Demand Forecasting & Inventory Dashboard -->
+    <section id="dashboard" class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">Module 8, 9 &amp; 10 &middot; Interactive Simulator</span>
+            <h2>Retail Demand Forecasting &amp; Inventory Dashboard</h2>
+            <p class="section-sub">
+              Simulate the Streamlit dashboard directly in your browser. Choose a product, compare ARIMA, Prophet, and LSTM predictions, toggle promotions or holidays, or upload your own CSV.
+            </p>
+          </div>
+          <div class="dataset-actions">
+            <button id="downloadCsvBtn" class="btn btn-secondary btn-sm" type="button">Download CSV</button>
+            <label class="btn btn-outline btn-sm upload-label">
+              Upload CSV
+              <input type="file" id="csvUploadInput" accept=".csv" hidden />
+            </label>
+            <button id="resetDatasetBtn" class="btn btn-secondary btn-sm" type="button">Reset Dataset</button>
+          </div>
+        </div>
+
+        <div id="csvStatusBanner" class="status-banner" hidden></div>
+
+        <!-- Dashboard Controls -->
+        <div class="dashboard-controls card">
+          <div class="control-group">
+            <label for="productSelect">Product</label>
+            <select id="productSelect"></select>
+          </div>
+          <div class="control-group">
+            <label for="modelSelect">Forecasting Model</label>
+            <select id="modelSelect">
+              <option value="all">Compare All (ARIMA, Prophet, LSTM)</option>
+              <option value="prophet" selected>Prophet (Trend + Seasonality + Holidays)</option>
+              <option value="lstm">LSTM (Sequence Neural Model)</option>
+              <option value="arima">ARIMA(2,1,2) Baseline</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="horizonSelect">Forecast Horizon</label>
+            <select id="horizonSelect">
+              <option value="7" selected>Next 7 Days</option>
+              <option value="14">Next 14 Days</option>
+              <option value="30">Next 30 Days</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="currentStockInput">Current Stock (Units)</label>
+            <input type="number" id="currentStockInput" min="0" max="5000" value="50" />
+          </div>
+          <div class="control-group">
+            <label for="safetyStockInput">Safety Stock (Units)</label>
+            <input type="number" id="safetyStockInput" min="0" max="1000" value="10" />
+          </div>
+          <div class="control-group toggles-group">
+            <span class="toggle-heading">Forecast Scenario Factors</span>
+            <div class="toggles-row">
+              <label class="chip-toggle">
+                <input type="checkbox" id="promoToggle" />
+                <span>Promotion Active</span>
+              </label>
+              <label class="chip-toggle">
+                <input type="checkbox" id="holidayToggle" />
+                <span>Holiday / Festival</span>
+              </label>
+              <div class="discount-control">
+                <label for="discountRange">Discount: <strong id="discountVal">5%</strong></label>
+                <input type="range" id="discountRange" min="0" max="30" step="5" value="5" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label" id="kpiHorizonLabel">Predicted Demand (7 Days)</span>
+            <strong class="kpi-value" id="kpiPredictedDemand">--</strong>
+            <span class="kpi-meta" id="kpiAvgDaily">-- units/day avg</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Test Set RMSE</span>
+            <strong class="kpi-value" id="kpiRmse">--</strong>
+            <span class="kpi-meta">Chronological 80/20 split (lower is better)</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Test Set MAPE</span>
+            <strong class="kpi-value" id="kpiMape">--</strong>
+            <span class="kpi-meta">Mean Absolute Percentage Error</span>
+          </div>
+          <div class="kpi-card kpi-highlight" id="kpiInventoryCard">
+            <span class="kpi-label">Inventory Recommendation</span>
+            <strong class="kpi-value" id="kpiReorderAction">--</strong>
+            <span class="kpi-meta" id="kpiStockFormula">Required = Forecast + Safety Stock</span>
+          </div>
+        </div>
+
+        <!-- Main Chart & Forecast Table -->
+        <div class="dashboard-main-grid">
+          <div class="card chart-card">
+            <div class="card-header-row">
+              <div>
+                <h3 id="mainChartTitle">Historical Sales &amp; Future Demand Forecast</h3>
+                <p class="card-sub">90-day historical units sold with 80/20 test validation and future prediction interval</p>
+              </div>
+              <div class="chart-legend" id="mainChartLegend"></div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="forecastChart" height="340"></canvas>
+              <div id="chartTooltip" class="chart-tooltip" hidden></div>
+            </div>
+          </div>
+
+          <div class="card forecast-side-card">
+            <h3>Upcoming Daily Forecast</h3>
+            <p class="card-sub">Predicted units &amp; inventory formula breakdown</p>
+            <div class="formula-box" id="inventoryFormulaBox"></div>
+            <div class="table-scroll">
+              <table class="data-table" id="forecastTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Predicted</th>
+                    <th>Range</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-Product Inventory Optimization Table -->
+        <div class="card inventory-table-card">
+          <div class="card-header-row">
+            <div>
+              <h3>Store-Wide Inventory Optimization Recommendations</h3>
+              <p class="card-sub">Computed across all tracked products using Forecast Demand + Safety Stock &minus; Current Stock</p>
+            </div>
+            <span class="pill-info">Interactive &middot; Click a row to inspect product</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table interactive-table" id="inventoryOverviewTable">
+              <thead>
+                <tr>
+                  <th>Product ID</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Current Stock</th>
+                  <th>Forecast Demand</th>
+                  <th>Safety Stock</th>
+                  <th>Required Stock</th>
+                  <th>Recommendation</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Live Daily Sale & Stock Entry Form -->
+        <div class="card mt-md">
+          <div class="card-header-row">
+            <div>
+              <h3>Record Daily Sale &amp; Update Stock (Live Persistence)</h3>
+              <p class="card-sub">Add or update a daily transaction for the selected product to re-train forecasts and persist to <code>dataset/retail_sales.csv</code></p>
+            </div>
+          </div>
+          <form id="recordSaleForm" class="record-sale-form">
+            <div class="control-group">
+              <label for="saleDateInput">Date</label>
+              <input type="date" id="saleDateInput" required value="2026-11-26" />
+            </div>
+            <div class="control-group">
+              <label for="saleUnitsInput">Units Sold</label>
+              <input type="number" id="saleUnitsInput" min="0" max="5000" required value="18" />
+            </div>
+            <div class="control-group">
+              <label for="saleDiscountInput">Discount (%)</label>
+              <input type="number" id="saleDiscountInput" min="0" max="80" value="10" />
+            </div>
+            <div class="control-group">
+              <label for="saleStockInput">Updated Stock</label>
+              <input type="number" id="saleStockInput" min="0" max="5000" required value="32" />
+            </div>
+            <div class="sale-flags">
+              <label class="chip-toggle">
+                <input type="checkbox" id="salePromoInput" checked />
+                <span>Promo</span>
+              </label>
+              <label class="chip-toggle">
+                <input type="checkbox" id="saleHolidayInput" />
+                <span>Holiday</span>
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save &amp; Re-Forecast</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- System Architecture & Dataset Section -->
+    <section id="architecture" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">Section 5 &amp; 6 &middot; System Pipeline</span>
+            <h2>End-to-End Project Architecture &amp; Dataset Schema</h2>
+            <p class="section-sub">A structured 8-stage workflow transforming raw historical retail transactions into actionable inventory reorder decisions.</p>
+          </div>
+        </div>
+
+        <!-- Architecture Pipeline -->
+        <div class="pipeline-grid">
+          <div class="pipeline-step">
+            <span class="step-num">01</span>
+            <h4>Historical Sales Data</h4>
+            <p>Sales, prices, discounts, promotions, and holidays across products &amp; stores.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="step-num">02</span>
+            <h4>Data Preprocessing</h4>
+            <p>Handle missing values, drop duplicates, parse dates, sort &amp; aggregate daily units.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="step-num">03</span>
+            <h4>Exploratory Analysis</h4>
+            <p>Inspect daily, weekly, monthly trends, festival peaks, and promo lift.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="step-num">04</span>
+            <h4>Feature Engineering</h4>
+            <p>Calendar flags, <code>Lag_1</code>, <code>Lag_7</code>, and leak-free <code>Rolling_Mean_7</code>.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="step-num">05</span>
+            <h4>Time Series Models</h4>
+            <p>Train ARIMA, Prophet, and LSTM on chronological 80% history.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="step-num">06</span>
+            <h4>Model Evaluation</h4>
+            <p>Benchmark test accuracy on latest 20% using RMSE and MAPE.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="step-num">07</span>
+            <h4>Future Prediction</h4>
+            <p>Generate 7-to-30 day demand forecasts with uncertainty bounds.</p>
+          </div>
+          <div class="pipeline-step accent">
+            <span class="step-num">08</span>
+            <h4>Inventory Dashboard</h4>
+            <p>Calculate safety stock &amp; reorder quantities in Streamlit.</p>
+          </div>
+        </div>
+
+        <!-- Dataset Description & Sources -->
+        <div class="two-col-grid mt-lg">
+          <div class="card">
+            <h3>Illustrative Sample Dataset</h3>
+            <p class="card-sub">Core fields used to train and evaluate demand forecasting models</p>
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Sales</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Holiday</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>2026-01-01</td><td>Laptop</td><td>10</td><td>45,000</td><td>5%</td><td><span class="tag tag-yes">Yes</span></td></tr>
+                  <tr><td>2026-01-02</td><td>Laptop</td><td>8</td><td>45,000</td><td>0%</td><td><span class="tag tag-no">No</span></td></tr>
+                  <tr><td>2026-01-03</td><td>Laptop</td><td>12</td><td>44,000</td><td>10%</td><td><span class="tag tag-no">No</span></td></tr>
+                  <tr><td>2026-01-04</td><td>Laptop</td><td>15</td><td>44,000</td><td>10%</td><td><span class="tag tag-yes">Yes</span></td></tr>
+                  <tr><td>2026-01-05</td><td>Laptop</td><td>9</td><td>45,000</td><td>0%</td><td><span class="tag tag-no">No</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h4 class="mt-md">Recommended Public Datasets</h4>
+            <ul class="source-links">
+              <li>
+                <a href="https://www.kaggle.com/competitions/store-sales-time-series-forecasting" target="_blank" rel="noopener noreferrer">
+                  Kaggle &ndash; Store Sales Time Series Forecasting (Recommended)
+                </a>
+                <span>Includes sales, promotions, holidays, and store metadata.</span>
+              </li>
+              <li>
+                <a href="https://www.kaggle.com/competitions/m5-forecasting-accuracy" target="_blank" rel="noopener noreferrer">
+                  Kaggle &ndash; M5 Forecasting Accuracy
+                </a>
+                <span>Hierarchical Walmart retail unit sales with prices &amp; events.</span>
+              </li>
+              <li>
+                <a href="https://archive.ics.uci.edu/" target="_blank" rel="noopener noreferrer">
+                  UCI Machine Learning Repository
+                </a>
+                <span>Online Retail datasets for transaction-level demand analysis.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Dataset Columns &amp; Technologies Used</h3>
+            <div class="tabs-bar" role="tablist">
+              <button class="tab-btn active" data-tab-group="schema-tech" data-tab="schema">Dataset Columns</button>
+              <button class="tab-btn" data-tab-group="schema-tech" data-tab="tech">Tech Stack</button>
+              <button class="tab-btn" data-tab-group="schema-tech" data-tab="structure">Folder Structure</button>
+            </div>
+            <div class="tab-panel active" data-panel-group="schema-tech" data-panel="schema">
+              <div class="table-scroll">
+                <table class="data-table compact">
+                  <thead><tr><th>Column</th><th>Description</th></tr></thead>
+                  <tbody id="schemaTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab-panel" data-panel-group="schema-tech" data-panel="tech">
+              <div class="table-scroll">
+                <table class="data-table compact">
+                  <thead><tr><th>Technology</th><th>Purpose</th></tr></thead>
+                  <tbody id="techTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab-panel" data-panel-group="schema-tech" data-panel="structure">
+              <pre class="code-block"><code>Retail_Demand_Forecasting/
+├── dataset/
+│   └── retail_sales.csv
+├── notebooks/
+│   └── demand_forecasting.ipynb
+├── models/
+│   ├── arima_model.pkl
+│   ├── prophet_model.pkl
+│   └── lstm_model.keras
+├── src/
+│   ├── preprocessing.py
+│   ├── eda.py
+│   ├── feature_engineering.py
+│   ├── model_training.py
+│   ├── evaluation.py
+│   └── inventory.py
+├── app.py
+└── requirements.txt</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDA & Feature Engineering Section -->
+    <section id="eda" class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">Modules 3 &amp; 4 &middot; Pattern Discovery</span>
+            <h2>Exploratory Data Analysis &amp; Feature Engineering</h2>
+            <p class="section-sub">Understand how weekends, promotions, and holidays drive retail demand, and inspect lag &amp; rolling features computed strictly from past observations.</p>
+          </div>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header-row">
+              <div>
+                <h3>Demand Drivers Breakdown</h3>
+                <p class="card-sub">Observed from active product dataset (<span id="edaProductName">Laptop</span>)</p>
+              </div>
+              <div class="segmented" id="edaModeButtons">
+                <button type="button" class="seg-btn active" data-eda="weekday">Weekday vs Weekend</button>
+                <button type="button" class="seg-btn" data-eda="promo">Promotions</button>
+                <button type="button" class="seg-btn" data-eda="holiday">Holidays</button>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="edaChart" height="270"></canvas>
+            </div>
+            <div class="eda-insight" id="edaInsightBox"></div>
+          </div>
+
+          <div class="card">
+            <h3>Engineered Time Series Features</h3>
+            <p class="card-sub">Leak-free lag &amp; rolling features calculated per product</p>
+            <div class="table-scroll">
+              <table class="data-table compact" id="featureTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Units</th>
+                    <th>Wknd</th>
+                    <th>Hol</th>
+                    <th>Promo</th>
+                    <th>Lag_1</th>
+                    <th>Lag_7</th>
+                    <th>Roll_7</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p class="note-muted">
+              Note: <code>Rolling_Mean_7</code> uses <code>.shift(1).rolling(7).mean()</code> so only past sales are used to predict future demand.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Forecasting Models & Evaluation Section -->
+    <section id="models" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">Modules 5, 6 &amp; 7 &middot; Model Benchmarking</span>
+            <h2>Comparing ARIMA, Prophet, and LSTM</h2>
+            <p class="section-sub">Chronological 80% / 20% train-test splitting preserves time order and prevents future data leakage.</p>
+          </div>
+        </div>
+
+        <!-- 80/20 Split Visual -->
+        <div class="card split-card">
+          <div class="split-header">
+            <strong>Chronological Train / Test Split</strong>
+            <span>Never shuffle time series data randomly</span>
+          </div>
+          <div class="split-bar">
+            <div class="split-train">Training Data &mdash; 80% (Earlier Dates)</div>
+            <div class="split-test">Testing &mdash; 20% (Latest Dates)</div>
+          </div>
+        </div>
+
+        <!-- 3 Model Cards -->
+        <div class="models-grid mt-md">
+          <article class="card model-card">
+            <div class="model-head">
+              <span class="model-tag statistical">Statistical Baseline</span>
+              <h3>ARIMA (p, d, q)</h3>
+            </div>
+            <p><strong>AutoRegressive Integrated Moving Average</strong> models linear patterns using lagged sales (AR), differencing for stationarity (I), and past forecast errors (MA).</p>
+            <ul class="pros-cons">
+              <li><strong>Strengths:</strong> Fast, interpretable, strong baseline for stationary univariate series.</li>
+              <li><strong>Limitations:</strong> Basic ARIMA excludes external promos/holidays unless extended to SARIMAX.</li>
+            </ul>
+            <div class="model-bench">
+              <div><span>Illustrative RMSE</span><strong>15.2</strong></div>
+              <div><span>Illustrative MAPE</span><strong>12.5%</strong></div>
+            </div>
+          </article>
+
+          <article class="card model-card featured">
+            <div class="model-head">
+              <span class="model-tag additive">Recommended Main Model</span>
+              <h3>Prophet</h3>
+            </div>
+            <p>Developed by Meta, Prophet decomposes retail demand as <code>y(t) = g(t) + s(t) + h(t) + &epsilon;<sub>t</sub></code> capturing trend, weekly/yearly seasonality, and festival effects.</p>
+            <ul class="pros-cons">
+              <li><strong>Strengths:</strong> Native holiday support, uncertainty intervals, and external promotion regressors.</li>
+              <li><strong>Limitations:</strong> Needs sufficient history for yearly seasonality; manual regressor setup.</li>
+            </ul>
+            <div class="model-bench">
+              <div><span>Illustrative RMSE</span><strong>11.8</strong></div>
+              <div><span>Illustrative MAPE</span><strong>9.2%</strong></div>
+            </div>
+          </article>
+
+          <article class="card model-card">
+            <div class="model-head">
+              <span class="model-tag deep-learning">Deep Learning</span>
+              <h3>LSTM (RNN)</h3>
+            </div>
+            <p><strong>Long Short-Term Memory</strong> networks use Forget, Input, and Output gates over 30-day sequences to learn complex nonlinear multi-feature patterns.</p>
+            <ul class="pros-cons">
+              <li><strong>Strengths:</strong> Captures nonlinear interactions and multivariate sequences on large datasets.</li>
+              <li><strong>Limitations:</strong> Higher training complexity, hyperparameter tuning, and lower interpretability.</li>
+            </ul>
+            <div class="model-bench">
+              <div><span>Illustrative RMSE</span><strong>10.5</strong></div>
+              <div><span>Illustrative MAPE</span><strong>8.1%</strong></div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Live Model Comparison Chart & Metrics Formulas -->
+        <div class="two-col-grid mt-md">
+          <div class="card">
+            <div class="card-header-row">
+              <div>
+                <h3>Live vs. Illustrative Model Error Comparison</h3>
+                <p class="card-sub">Lower RMSE and MAPE indicate higher forecasting accuracy</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="comparisonChart" height="260"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Evaluation Metrics &amp; Decision Criteria</h3>
+            <div class="formula-card">
+              <h4>RMSE &mdash; Root Mean Squared Error</h4>
+              <div class="math-display">RMSE = &radic;( (1/n) &Sigma; (y<sub>i</sub> &minus; &ycirc;<sub>i</sub>)&sup2; )</div>
+              <p>Measures average prediction error magnitude in unit terms, penalizing large forecast misses more heavily.</p>
+            </div>
+            <div class="formula-card">
+              <h4>MAPE &mdash; Mean Absolute Percentage Error</h4>
+              <div class="math-display">MAPE = (100 / n) &Sigma; | (y<sub>i</sub> &minus; &ycirc;<sub>i</sub>) / y<sub>i</sub> |</div>
+              <p>Expresses forecast error as a percentage. Note: undefined when actual sales <code>y<sub>i</sub> = 0</code>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Python Code & Implementation Reference -->
+    <section id="code" class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">Modules 2 &ndash; 10 &middot; Code Reference</span>
+            <h2>Python Implementation Snippets</h2>
+            <p class="section-sub">Ready-to-use Python modules for preprocessing, feature engineering, ARIMA, Prophet, LSTM, evaluation, and Streamlit deployment.</p>
+          </div>
+        </div>
+
+        <div class="card code-viewer">
+          <div class="code-tabs-header">
+            <div class="tabs-bar" id="codeTabs">
+              <button class="tab-btn active" data-code="preprocessing">Preprocessing</button>
+              <button class="tab-btn" data-code="features">Features</button>
+              <button class="tab-btn" data-code="arima">ARIMA</button>
+              <button class="tab-btn" data-code="prophet">Prophet</button>
+              <button class="tab-btn" data-code="lstm">LSTM</button>
+              <button class="tab-btn" data-code="evaluation">Evaluation</button>
+              <button class="tab-btn" data-code="streamlit">Streamlit app.py</button>
+            </div>
+            <button id="copyCodeBtn" class="btn btn-secondary btn-sm" type="button">Copy Code</button>
+          </div>
+          <pre class="code-block large"><code id="codeDisplay"></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Applications, Enhancements & Viva Q&A -->
+    <section id="viva" class="section">
+      <div class="container">
+        <div class="two-col-grid">
+          <div>
+            <span class="eyebrow">Sections 18, 19 &amp; 21 &middot; Impact &amp; Roadmap</span>
+            <h2>Real-World Applications &amp; Future Enhancements</h2>
+            <div class="card mt-sm">
+              <h4>Industry Applications</h4>
+              <ul class="bullet-list">
+                <li><strong>Supermarkets:</strong> Predict daily perishable and grocery demand to reduce spoilage.</li>
+                <li><strong>Clothing Retail:</strong> Forecast seasonal apparel collections across months.</li>
+                <li><strong>Electronics Stores:</strong> Plan high-value stock (laptops, mobiles) around festival sales.</li>
+                <li><strong>E-Commerce &amp; Pharma:</strong> Anticipate promo spikes and critical medicine stock levels.</li>
+              </ul>
+              <h4 class="mt-md">Future Scope</h4>
+              <div class="tags-wrap">
+                <span class="tag-chip">Real-time POS Integration</span>
+                <span class="tag-chip">Auto Reorder Alerts</span>
+                <span class="tag-chip">Weather-Based Demand</span>
+                <span class="tag-chip">Supplier Lead-Time ML</span>
+                <span class="tag-chip">Store-Wise Cloud API</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span class="eyebrow">Section 22 &middot; Interview &amp; Presentation Prep</span>
+            <h2>Viva &amp; Interview Q&amp;A</h2>
+            <div class="accordion mt-sm" id="vivaAccordion"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Project 5: Demand Forecasting for Retail Using Time Series Prediction</strong>
+        <p>ARIMA &middot; Prophet &middot; LSTM &middot; RMSE &amp; MAPE Evaluation &middot; Inventory Optimization</p>
+      </div>
+      <div class="footer-links">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#models">Models</a>
+        <a href="#code">Python Code</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="forecasting.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
